@@ -1,4 +1,15 @@
 apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: tt10-build
+spec:
+  triggers:
+    - binding:
+        name: simple-binding
+      template:
+        name: tt10-build
+---
+apiVersion: tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: tt10-build
