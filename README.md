@@ -86,3 +86,17 @@ If not set, **TARGET_NAMESPACE** is set to **default**. **REGISTRY_URL** needs t
 ## License
 
 See [License.txt](License.txt) for license information.
+
+## Tekton
+Converting this project to use tekton:
+
+In this README.md file:
+- Create toolchain button points to this repository
+
+In .bluemix/toolchain.yml file:
+- build pipeline was changed to type: tekton
+- configuration.content.$text = tekton.yaml instead of pipeline.yml
+- services.repo.service_id.parametersrepo_url: 'https://github.com/IBM-Cloud/secure-file-storage' > 'https://github.com/powellquiring/sfs-tekton'
+
+Added a .bluemix/tekton.yaml to describe the pipeline stage.  Few things to notice:
+- 

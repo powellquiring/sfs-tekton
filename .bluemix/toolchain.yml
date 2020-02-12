@@ -16,7 +16,7 @@ services:
     service_id: githubpublic
     parameters:
       repo_name: 'secure-file-storage'
-      repo_url: 'https://github.com/IBM-Cloud/secure-file-storage'
+      repo_url: 'https://github.com/powellquiring/sfs-tekton'
       type: clone
       has_issues: false
       enable_traceability: false
