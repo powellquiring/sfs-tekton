@@ -1,0 +1,66 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: tt10-build
+spec:
+  params:
+    - name: registryNamespace
+      description: registryNamespace example
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineRun
+      metadata:
+        name: pipelinerun-$(uid)
+      spec:
+        pipelineRef:
+          name: pipeline-input-parameter-variable
+        params:
+          - name: registryNamespace
+            value: $(params.registryNamespace)
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: pipeline-input-parameter-variable
+spec:
+  params:
+    - name: registryNamespace
+      description: registryNamespace example in pipeline
+  tasks:
+    - name: pipv
+      params:
+        - name: registryNamespace
+          value: $(params.registryNamespace)
+      taskRef:
+        name: the-var-task
+
+---
+# shared task
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: the-var-task
+spec:
+  inputs:
+    params:
+      - name: registryNamespace
+        description: registryNamespace example in task
+        default: VALUE
+  steps:
+    - name: echoenvvar
+      image: ubuntu
+      env:
+        - name: VAR
+          value: $(inputs.params.registryNamespace)
+      command:
+        - "/bin/bash"
+      args:
+        - "-c"
+        - "echo 01 lab2 env VAR: $VAR"
+    - name: echovar
+      image: ubuntu
+      command:
+        - /bin/echo
+      args:
+        - $(inputs.params.registryNamespace)
+
