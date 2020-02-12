@@ -4,10 +4,6 @@ inputs:
   service: ${GIT_REPO}
   branch: ${GIT_BRANCH}
   path: .tekton
-- type: git
-  service: https://github.com/open-toolchain/tekton-catalog
-  branch: master
-  path: git
 triggers:
 - type: git
   name: Git PR Trigger
