@@ -14,25 +14,22 @@ kind: TriggerBinding
 metadata:
   name: simple-binding
 ---
-#apikey
-#cluster
-#Name
-#clusterNamespace
-#clusterRegion
-#registryNamespace
-#registryRegion
-#repository
-#revision
-
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: tt10-build
 spec:
   params:
-    - name: registryNamespace
+    - name: GIT_REPO
     - name: X
   resourcetemplates:
+    - apiVersion: v1
+      kind: Secret
+      metadata:
+        name: cd-secret
+      type: Opaque
+      stringData:
+        API_KEY: $(params.API_KEY)
     - apiVersion: tekton.dev/v1alpha1
       kind: PipelineRun
       metadata:
@@ -41,8 +38,8 @@ spec:
         pipelineRef:
           name: pipeline-input-parameter-variable
         params:
-          - name: registryNamespace
-            value: $(params.registryNamespace)
+          - name: GIT_REPO
+            value: $(params.GIT_REPO)
           - name: X
             value: $(params.X)
 ---
@@ -52,13 +49,13 @@ metadata:
   name: pipeline-input-parameter-variable
 spec:
   params:
-    - name: registryNamespace
+    - name: GIT_REPO
     - name: X
   tasks:
     - name: pipv
       params:
-        - name: registryNamespace
-          value: $(params.registryNamespace)
+        - name: GIT_REPO
+          value: $(params.GIT_REPO)
         - name: X
           value: $(params.X)
       taskRef:
@@ -73,14 +70,19 @@ metadata:
 spec:
   inputs:
     params:
-      - name: registryNamespace
+      - name: GIT_REPO
       - name: X
   steps:
     - name: echoenvvar
       image: ubuntu
       env:
-        - name: registryNamespace
-          value: $(inputs.params.registryNamespace)
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: cd-secret
+              key: API_KEY
+        - name: GIT_REPO
+          value: $(inputs.params.GIT_REPO)
         - name: X
           value: $(inputs.params.X)
       command: ["/bin/bash", "-c"]
@@ -88,5 +90,6 @@ spec:
         - |
           set -x
           echo 00
-          echo 01 lab2 env registryNamespace: $registryNamespace
-          echo 01 lab2 env X: $X
+          echo env API_KEY: $API_KEY
+          echo env GIT_REPO: $GIT_REPO
+          echo env X: $X
