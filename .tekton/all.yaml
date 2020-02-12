@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: EventListener
 metadata:
-  name: tt10-build
+  name: 10-build
 spec:
   triggers:
     - binding:
