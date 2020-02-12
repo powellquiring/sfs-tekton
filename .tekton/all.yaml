@@ -14,6 +14,16 @@ kind: TriggerBinding
 metadata:
   name: simple-binding
 ---
+#apikey
+#cluster
+#Name
+#clusterNamespace
+#clusterRegion
+#registryNamespace
+#registryRegion
+#repository
+#revision
+
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
@@ -21,7 +31,7 @@ metadata:
 spec:
   params:
     - name: registryNamespace
-      description: registryNamespace example
+    - name: X
   resourcetemplates:
     - apiVersion: tekton.dev/v1alpha1
       kind: PipelineRun
@@ -33,6 +43,8 @@ spec:
         params:
           - name: registryNamespace
             value: $(params.registryNamespace)
+          - name: X
+            value: $(params.X)
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
@@ -41,12 +53,14 @@ metadata:
 spec:
   params:
     - name: registryNamespace
-      description: registryNamespace example in pipeline
+    - name: X
   tasks:
     - name: pipv
       params:
         - name: registryNamespace
           value: $(params.registryNamespace)
+        - name: X
+          value: $(params.X)
       taskRef:
         name: the-var-task
 
@@ -60,23 +74,19 @@ spec:
   inputs:
     params:
       - name: registryNamespace
-        description: registryNamespace example in task
-        default: VALUE
+      - name: X
   steps:
     - name: echoenvvar
       image: ubuntu
       env:
-        - name: VAR
+        - name: registryNamespace
           value: $(inputs.params.registryNamespace)
-      command:
-        - "/bin/bash"
+        - name: X
+          value: $(inputs.params.X)
+      command: ["/bin/bash", "-c"]
       args:
-        - "-c"
-        - "echo 01 lab2 env VAR: $VAR"
-    - name: echovar
-      image: ubuntu
-      command:
-        - /bin/echo
-      args:
-        - $(inputs.params.registryNamespace)
-
+        - |
+          set -x
+          echo 00
+          echo 01 lab2 env registryNamespace: $registryNamespace
+          echo 01 lab2 env X: $X

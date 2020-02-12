@@ -1,15 +1,19 @@
 ---
 inputs:
 - type: git
-  branch: ${GIT_BRANCH}
   service: ${GIT_REPO}
+  branch: ${GIT_BRANCH}
   path: .tekton
+- type: git
+  service: https://github.com/open-toolchain/tekton-catalog
+  branch: master
+  path: git
 triggers:
 - type: git
   name: Git PR Trigger
   service: ${GIT_REPO}
   branch: master
-  events: {"push":true,"pull_request":true,"pull_request_closed":false}
+  events: {"push":true,"pull_request":false,"pull_request_closed":false}
   eventListener: listener
 - type: manual
   name: Manual Trigger
