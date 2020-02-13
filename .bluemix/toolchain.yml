@@ -32,7 +32,7 @@ services:
         content:
           $text: tekton.yaml
         env:
-          GIT_REPO: repo
+          GIT_REPO: 'https://github.com/powellquiring/sfs-tekton'
           GIT_BRANCH: '{{form.pipeline.parameters.branch-name}}'
           API_KEY: '{{form.pipeline.parameters.api-key}}'
           REGISTRY_REGION_ID: '{{form.pipeline.parameters.target-region}}'

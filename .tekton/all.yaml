@@ -55,6 +55,16 @@ spec:
     - name: GIT_REPO
     - name: X
   tasks:
+    - name: clone
+      taskRef:
+        name: clone-repo-task
+      params:
+        - name: task-pvc
+          value: $(params.task-pvc)
+        - name: repository
+          value: $(params.GIT_REPO)
+        - name: branch
+          value: master
     - name: t1
       params:
         - name: task-pvc
@@ -65,6 +75,8 @@ spec:
           value: $(params.X)
       taskRef:
         name: the-var-task
+      runAfter:
+        - clone
     - name: t2
       params:
         - name: task-pvc
