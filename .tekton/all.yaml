@@ -21,7 +21,16 @@ metadata:
 spec:
   params:
     - name: GIT_REPO
-    - name: X
+    - name: GIT_BRANCH
+    - name: REGISTRY_REGION_ID
+    - name: REGISTRY_NAMESPACE
+    - name: TARGET_CLUSTER_NAME
+    - name: IMAGE_NAME
+    - name: TARGET_REGION_ID
+    - name: TARGET_NAMESPACE
+    - name: TARGET_RESOURCE_GROUP
+    - name: COS_PLAN
+    - name: APP_ID_PLAN
   resourcetemplates:
     - apiVersion: v1
       kind: Secret
@@ -42,8 +51,24 @@ spec:
             value: pipelinerun-$(uid)-pvc
           - name: GIT_REPO
             value: $(params.GIT_REPO)
-          - name: X
-            value: $(params.X)
+          - name: GIT_BRANCH
+            value: $(params.GIT_BRANCH)
+          - name: REGISTRY_REGION_ID
+            value: $(params.REGISTRY_REGION_ID)
+          - name: REGISTRY_NAMESPACE
+            value: $(params.REGISTRY_NAMESPACE)
+          - name: TARGET_CLUSTER_NAME
+            value: $(params.TARGET_CLUSTER_NAME)
+          - name: IMAGE_NAME
+            value: $(params.IMAGE_NAME)
+          - name: TARGET_REGION_ID
+            value: $(params.TARGET_REGION_ID)
+          - name: TARGET_NAMESPACE
+            value: $(params.TARGET_NAMESPACE)
+          - name: TARGET_RESOURCE_GROUP
+            value: $(params.TARGET_RESOURCE_GROUP)
+          - name: COS_PLAN
+            value: $(params.COS_PLAN)
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: Pipeline
@@ -53,7 +78,16 @@ spec:
   params:
     - name: task-pvc
     - name: GIT_REPO
-    - name: X
+    - name: GIT_BRANCH
+    - name: REGISTRY_REGION_ID
+    - name: REGISTRY_NAMESPACE
+    - name: TARGET_CLUSTER_NAME
+    - name: IMAGE_NAME
+    - name: TARGET_REGION_ID
+    - name: TARGET_NAMESPACE
+    - name: TARGET_RESOURCE_GROUP
+    - name: COS_PLAN
+    - name: APP_ID_PLAN
   tasks:
     - name: clone
       taskRef:
@@ -71,36 +105,53 @@ spec:
           value: $(params.task-pvc)
         - name: GIT_REPO
           value: $(params.GIT_REPO)
-        - name: X
-          value: $(params.X)
+        - name: GIT_BRANCH
+          value: $(params.GIT_BRANCH)
+        - name: REGISTRY_REGION_ID
+          value: $(params.REGISTRY_REGION_ID)
+        - name: REGISTRY_NAMESPACE
+          value: $(params.REGISTRY_NAMESPACE)
+        - name: TARGET_CLUSTER_NAME
+          value: $(params.TARGET_CLUSTER_NAME)
+        - name: IMAGE_NAME
+          value: $(params.IMAGE_NAME)
+        - name: TARGET_REGION_ID
+          value: $(params.TARGET_REGION_ID)
+        - name: TARGET_NAMESPACE
+          value: $(params.TARGET_NAMESPACE)
+        - name: TARGET_RESOURCE_GROUP
+          value: $(params.TARGET_RESOURCE_GROUP)
+        - name: COS_PLAN
+          value: $(params.COS_PLAN)
+        - name: APP_ID_PLAN
+          value: $(params.APP_ID_PLAN)
+        - name: script
+          value: ./scripts/pipeline-BUILD.sh
       taskRef:
-        name: the-var-task
+        name: gasket
       runAfter:
         - clone
-    - name: t2
-      params:
-        - name: task-pvc
-          value: $(params.task-pvc)
-        - name: GIT_REPO
-          value: $(params.GIT_REPO)
-        - name: X
-          value: $(params.X)
-      taskRef:
-        name: the-var-task
-      runAfter:
-        - t1
 ---
-# shared task
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: the-var-task
+  name: gasket
 spec:
   inputs:
     params:
       - name: task-pvc
       - name: GIT_REPO
-      - name: X
+      - name: GIT_BRANCH
+      - name: REGISTRY_REGION_ID
+      - name: REGISTRY_NAMESPACE
+      - name: TARGET_CLUSTER_NAME
+      - name: IMAGE_NAME
+      - name: TARGET_REGION_ID
+      - name: TARGET_NAMESPACE
+      - name: TARGET_RESOURCE_GROUP
+      - name: COS_PLAN
+      - name: APP_ID_PLAN
+      - name: script
   steps:
     - name: echoenvvar
       image: ubuntu
@@ -114,8 +165,28 @@ spec:
               key: API_KEY
         - name: GIT_REPO
           value: $(inputs.params.GIT_REPO)
-        - name: X
-          value: $(inputs.params.X)
+        - name: GIT_BRANCH
+          value: $(inputs.params.GIT_BRANCH)
+        - name: REGISTRY_REGION_ID
+          value: $(inputs.params.REGISTRY_REGION_ID)
+        - name: REGISTRY_NAMESPACE
+          value: $(inputs.params.REGISTRY_NAMESPACE)
+        - name: TARGET_CLUSTER_NAME
+          value: $(inputs.params.TARGET_CLUSTER_NAME)
+        - name: IMAGE_NAME
+          value: $(inputs.params.IMAGE_NAME)
+        - name: TARGET_REGION_ID
+          value: $(inputs.params.TARGET_REGION_ID)
+        - name: TARGET_NAMESPACE
+          value: $(inputs.params.TARGET_NAMESPACE)
+        - name: TARGET_RESOURCE_GROUP
+          value: $(inputs.params.TARGET_RESOURCE_GROUP)
+        - name: COS_PLAN
+          value: $(inputs.params.COS_PLAN)
+        - name: APP_ID_PLAN
+          value: $(inputs.params.APP_ID_PLAN)
+        - name: script
+          value: $(inputs.params.script)
       command: ["/bin/bash", "-c"]
       args:
         - |
@@ -124,10 +195,23 @@ spec:
           echo env task_pvc: $task_pvc
           echo env API_KEY: $API_KEY
           echo env GIT_REPO: $GIT_REPO
-          echo env X: $X
+          echo env GIT_BRANCH: $GIT_BRANCH
+          echo env REGISTRY_REGION_ID: $REGISTRY_REGION_ID
+          echo env REGISTRY_NAMESPACE: $REGISTRY_NAMESPACE
+          echo env TARGET_CLUSTER_NAME: $TARGET_CLUSTER_NAME
+          echo env IMAGE_NAME: $IMAGE_NAME
+          echo env TARGET_REGION_ID: $TARGET_REGION_ID
+          echo env TARGET_NAMESPACE: $TARGET_NAMESPACE
+          echo env TARGET_RESOURCE_GROUP: $TARGET_RESOURCE_GROUP
+          echo env COS_PLAN: $COS_PLAN
+          echo env APP_ID_PLAN: $APP_ID_PLAN
+          echo env script: $script
           ls /working
           echo hi >> /working/hi
           cat /working/hi
+          cd /working
+          ls -l $script
+          cat $script
       volumeMounts:
         - mountPath: /working
           name: task-volume
