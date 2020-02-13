@@ -154,7 +154,7 @@ spec:
       - name: script
   steps:
     - name: echoenvvar
-      image: ibmcom/pipeline-base-image
+      image: l2fprod/bxshell
       env:
         - name: task_pvc
           value: $(inputs.params.task-pvc)
@@ -217,11 +217,24 @@ spec:
           # TODO BUILD_NUMBER is not needed
           export BUILD_NUMBER=3
           export ARCHIVE_DIR=.
+          # Setting HOME explicitly to have ibmcloud plugins available
+          export HOME="/root"
+          cat /cd-config/toolchain.json
+          TOOLCHAIN_ID=$(jq -r '.toolchain_guid' /cd-config/toolchain.json)
+          TOOLCHAIN_REGION=$(jq -r '.region_id' /cd-config/toolchain.json | awk -F: '{print $3}')
           bash -x $script
       volumeMounts:
+        - mountPath: /cd-config
+          name: cd-config-volume
         - mountPath: /working
           name: task-volume
   volumes:
     - name: task-volume
       persistentVolumeClaim:
         claimName: $(inputs.params.task-pvc)
+    - name: cd-config-volume
+      configMap:
+        name: toolchain
+        items:
+        - key: toolchain.json
+          path: toolchain.json
