@@ -99,7 +99,7 @@ spec:
           value: $(params.GIT_REPO)
         - name: branch
           value: master
-    - name: t1
+    - name: pipeline-BUILD
       params:
         - name: task-pvc
           value: $(params.task-pvc)
@@ -131,6 +131,38 @@ spec:
         name: gasket
       runAfter:
         - clone
+    - name: pipeline-DEPLOY
+      params:
+        - name: task-pvc
+          value: $(params.task-pvc)
+        - name: GIT_REPO
+          value: $(params.GIT_REPO)
+        - name: GIT_BRANCH
+          value: $(params.GIT_BRANCH)
+        - name: REGISTRY_REGION_ID
+          value: $(params.REGISTRY_REGION_ID)
+        - name: REGISTRY_NAMESPACE
+          value: $(params.REGISTRY_NAMESPACE)
+        - name: TARGET_CLUSTER_NAME
+          value: $(params.TARGET_CLUSTER_NAME)
+        - name: IMAGE_NAME
+          value: $(params.IMAGE_NAME)
+        - name: TARGET_REGION_ID
+          value: $(params.TARGET_REGION_ID)
+        - name: TARGET_NAMESPACE
+          value: $(params.TARGET_NAMESPACE)
+        - name: TARGET_RESOURCE_GROUP
+          value: $(params.TARGET_RESOURCE_GROUP)
+        - name: COS_PLAN
+          value: $(params.COS_PLAN)
+        - name: APP_ID_PLAN
+          value: $(params.APP_ID_PLAN)
+        - name: script
+          value: ./scripts/pipeline-DEPLOY.sh
+      taskRef:
+        name: gasket
+      runAfter:
+        - pipeline-BUILD
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: Task
