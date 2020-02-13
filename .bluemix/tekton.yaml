@@ -4,16 +4,6 @@ inputs:
   service: ${GIT_REPO}
   branch: ${GIT_BRANCH}
   path: .tekton
-triggers:
-- type: git
-  name: Git PR Trigger
-  service: ${GIT_REPO}
-  branch: master
-  events: {"push":true,"pull_request":false,"pull_request_closed":false}
-  eventListener: listener
-- type: manual
-  name: Manual Trigger
-  eventListener: listener
 properties:
 - name: GIT_REPO
   value: ${GIT_REPO}
@@ -46,8 +36,21 @@ properties:
   value: ${TARGET_RESOURCE_GROUP}
   type: text 
 - name: COS_PLAN
-  value: ${COS_PLAN}
+  value: "lite"
   type: text 
 - name: APP_ID_PLAN
-  value: ${APP_ID_PLAN}
+  value: "lite"
   type: text 
+triggers:
+- eventListener: 10-build
+  name: 10-build
+  type: manual
+- branch: master
+  eventListener: 10-build
+  events:
+    pull_request: false
+    pull_request_closed: false
+    push: true
+  name: Git PR Trigger
+  type: git
+  url: https://github.com/powellquiring/sfs-tekton.git
