@@ -38,6 +38,8 @@ spec:
         pipelineRef:
           name: pipeline-input-parameter-variable
         params:
+          - name: task-pvc
+            value: pipelinerun-$(uid)-pvc
           - name: GIT_REPO
             value: $(params.GIT_REPO)
           - name: X
@@ -49,18 +51,32 @@ metadata:
   name: pipeline-input-parameter-variable
 spec:
   params:
+    - name: task-pvc
     - name: GIT_REPO
     - name: X
   tasks:
-    - name: pipv
+    - name: t1
       params:
+        - name: task-pvc
+          value: $(params.task-pvc)
         - name: GIT_REPO
           value: $(params.GIT_REPO)
         - name: X
           value: $(params.X)
       taskRef:
         name: the-var-task
-
+    - name: t2
+      params:
+        - name: task-pvc
+          value: $(params.task-pvc)
+        - name: GIT_REPO
+          value: $(params.GIT_REPO)
+        - name: X
+          value: $(params.X)
+      taskRef:
+        name: the-var-task
+      runAfter:
+        - t1
 ---
 # shared task
 apiVersion: tekton.dev/v1alpha1
@@ -70,12 +86,15 @@ metadata:
 spec:
   inputs:
     params:
+      - name: task-pvc
       - name: GIT_REPO
       - name: X
   steps:
     - name: echoenvvar
       image: ubuntu
       env:
+        - name: task_pvc
+          value: $(inputs.params.task-pvc)
         - name: API_KEY
           valueFrom:
             secretKeyRef:
@@ -90,6 +109,17 @@ spec:
         - |
           set -x
           echo 00
+          echo env task_pvc: $task_pvc
           echo env API_KEY: $API_KEY
           echo env GIT_REPO: $GIT_REPO
           echo env X: $X
+          ls /working
+          echo hi >> /working/hi
+          cat /working/hi
+      volumeMounts:
+        - mountPath: /working
+          name: task-volume
+  volumes:
+    - name: task-volume
+      persistentVolumeClaim:
+        claimName: $(inputs.params.task-pvc)
