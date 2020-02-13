@@ -154,7 +154,7 @@ spec:
       - name: script
   steps:
     - name: echoenvvar
-      image: ubuntu
+      image: ibmcom/pipeline-base-image
       env:
         - name: task_pvc
           value: $(inputs.params.task-pvc)
