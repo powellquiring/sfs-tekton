@@ -41,6 +41,9 @@ properties:
 - name: APP_ID_PLAN
   value: "lite"
   type: text 
+- name: CLOUDANT_PLAN
+  value: "lite"
+  type: text 
 triggers:
 - eventListener: 10-build
   name: 10-build
