@@ -212,6 +212,12 @@ spec:
           cd /working
           ls -l $script
           cat $script
+          # TODO REGISTRY_URL mus be based on TARGET_REGION_ID
+          export REGISTRY_URL=us.icr.io
+          # TODO BUILD_NUMBER is not needed
+          export BUILD_NUMBER=3
+          export ARCHIVE_DIR=.
+          bash -x $script
       volumeMounts:
         - mountPath: /working
           name: task-volume
