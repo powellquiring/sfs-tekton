@@ -7,7 +7,7 @@ spec:
     - binding:
         name: pipeline-BUILD
       template:
-        name: tt-build
+        name: tt-common
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: EventListener
@@ -18,7 +18,7 @@ spec:
     - binding:
         name: pipeline-DEPLOY
       template:
-        name: tt-deploy
+        name: tt-common
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerBinding
@@ -41,7 +41,7 @@ spec:
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
-  name: tt-build
+  name: tt-common
 spec:
   params:
     - name: GIT_REPO
