@@ -10,6 +10,16 @@ spec:
         name: tt-common
 ---
 apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: pipeline-BUILD
+spec:
+  params:
+  - name: script
+    value: ./scripts/pipeline-BUILD.sh
+
+---
+apiVersion: tekton.dev/v1alpha1
 kind: EventListener
 metadata:
   name: DEPLOY
@@ -23,20 +33,33 @@ spec:
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
-  name: pipeline-BUILD
-spec:
-  params:
-  - name: script
-    value: ./scripts/pipeline-BUILD.sh
----
-apiVersion: tekton.dev/v1alpha1
-kind: TriggerBinding
-metadata:
   name: pipeline-DEPLOY
 spec:
   params:
   - name: script
     value: ./scripts/pipeline-DEPLOY.sh
+
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: ROTATE_STORAGE_CREDENTIALS
+spec:
+  triggers:
+    - binding:
+        name: pipeline-ROTATE-STORAGE-CREDENTIALS
+      template:
+        name: tt-common
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: pipeline-ROTATE-STORAGE-CREDENTIALS
+spec:
+  params:
+  - name: script
+    value: ./scripts/pipeline-ROTATE_STORAGE_CREDENTIALS.sh
+
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerTemplate
