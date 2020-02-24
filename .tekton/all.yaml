@@ -62,6 +62,68 @@ spec:
 
 ---
 apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: ROTATE_APPID_CREDENTIALS
+spec:
+  triggers:
+    - binding:
+        name: pipeline-ROTATE-APPID-CREDENTIALS
+      template:
+        name: tt-common
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: pipeline-ROTATE-APPID-CREDENTIALS
+spec:
+  params:
+  - name: script
+    value: ./scripts/pipeline-ROTATE_APPID_CREDENTIALS.sh
+
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: ROTATE_REGISTGRY_CREDENTIALS
+spec:
+  triggers:
+    - binding:
+        name: pipeline-ROTATE-REGISTGRY-CREDENTIALS
+      template:
+        name: tt-common
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: pipeline-ROTATE-REGISTGRY-CREDENTIALS
+spec:
+  params:
+  - name: script
+    value: ./scripts/pipeline-ROTATE_REGISTGRY_CREDENTIALS.sh
+
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: UNINSTALL
+spec:
+  triggers:
+    - binding:
+        name: pipeline-UNINSTALL
+      template:
+        name: tt-common
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: pipeline-UNINSTALL
+spec:
+  params:
+  - name: script
+    value: ./scripts/pipeline-UNINSTALL.sh
+---
+apiVersion: tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: tt-common
